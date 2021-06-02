@@ -2,7 +2,7 @@
   "Actions": [
     {
       "Icon": "actionIcon",
-      "Name": "Number Display",
+      "Name": "URL Saver",
       "States": [
         {
           "Image": "actionDefaultImage",
@@ -12,17 +12,17 @@
       ],
       "SupportedInMultiActions": false,
       "Tooltip": "This action displays a value set by the user",
-      "UUID": "com.elgato.numberdisplay.action"
+      "UUID": "com.elgato.URLsaver.action"
     }
   ],
   "SDKVersion": 2,
-  "Author": "Elgato",
+  "Author": "Greenstuff & Sylvie",
   "CodePath": "index.html",
   "Description": "This lets you display a value chosen by the user",
-  "Name": "Number Display",
+  "Name": "URL Saver",
   "Icon": "pluginIcon",
   "URL": "https://www.elgato.com/gaming/stream-deck",
-  "PropertyInspectorPath": "numberdisplay_pi.html",
+  "PropertyInspectorPath": "URLsaver_pi.html",
   "Version": "1.4",
   "OS": [
     {
