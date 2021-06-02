@@ -16,14 +16,14 @@
 		let isLongPush = false;
 		var DestinationEnum = Object.freeze({ "HARDWARE_AND_SOFTWARE": 0, "HARDWARE_ONLY": 1, "SOFTWARE_ONLY": 2 })
 
-		var numberdisplayAction = {
+		var URLsaverdisplayAction = {
 
 			type: "com.elgato.numberdisplay.action",
 
 			onKeyDown: function (context, settings, coordinates, userDesiredState) {
    			timer = setTimeout(function () {
 
-					var urlSaved = "";
+				var urlSaved = "";
 				var updatedSettings = {};
 				if (settings != null && settings.hasOwnProperty('urlSaved')) {
 					urlSaved = settings["urlSaved"];
@@ -38,7 +38,7 @@
         console.log("Message reçu : ", event.data);
 				urlToSave = event.data;
 				updatedSettings["urlSaved"] = event.data;
-				numberdisplayAction.SetSettings(context, updatedSettings);
+				URLsaverdisplayAction.SetSettings(context, updatedSettings);
 				isLongPush = true;
     			};
 				};
@@ -56,7 +56,7 @@
 				if(settings != null && settings.hasOwnProperty('urlSaved')){
 					UrlToShow = settings["urlSaved"];
 					console.log("URL sauvegardée : " + UrlToShow);
-					numberdisplayAction.OpenURL(UrlToShow);
+					URLsaverdisplayAction.OpenURL(UrlToShow);
 				}				
 			}
 			isLongPush = false;
@@ -137,26 +137,26 @@
 					var settings = jsonPayload['settings'];
 					var coordinates = jsonPayload['coordinates'];
 					var userDesiredState = jsonPayload['userDesiredState'];
-					numberdisplayAction.onKeyDown(context, settings, coordinates, userDesiredState);
+					URLsaverdisplayAction.onKeyDown(context, settings, coordinates, userDesiredState);
 				}
 				else if (event == "keyUp") {
 					var settings = jsonPayload['settings'];
 					var coordinates = jsonPayload['coordinates'];
 					var userDesiredState = jsonPayload['userDesiredState'];
-					numberdisplayAction.onKeyUp(context, settings, coordinates, userDesiredState);
+					URLsaverdisplayAction.onKeyUp(context, settings, coordinates, userDesiredState);
 				}
 				else if (event == "willAppear") {
 					var settings = jsonPayload['settings'];
 					var coordinates = jsonPayload['coordinates'];
-					numberdisplayAction.onWillAppear(context, settings, coordinates);
+					URLsaverdisplayAction.onWillAppear(context, settings, coordinates);
 				}
 				else if (event == "sendToPlugin") {
 
 					if (jsonPayload.hasOwnProperty('setValue')) {
 
 						var newValue = jsonPayload.setValue;
-						numberdisplayAction.SetSettings(context, { "urlSaved": newValue });
-						numberdisplayAction.SetTitle(context, newValue);
+						URLsaverdisplayAction.SetSettings(context, { "urlSaved": newValue });
+						URLsaverdisplayAction.SetTitle(context, newValue);
 
 					}
 
