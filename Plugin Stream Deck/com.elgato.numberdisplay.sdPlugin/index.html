@@ -1,0 +1,210 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>com.elgato.numberdisplay</title>
+	<meta charset="utf-8" />
+</head>
+
+<body>
+	<script>
+
+		var websocket = null;
+		var pluginUUID = null;
+		var settingsCache = {};
+		let urlToSave = '';
+		let isLongPush = false;
+		var DestinationEnum = Object.freeze({ "HARDWARE_AND_SOFTWARE": 0, "HARDWARE_ONLY": 1, "SOFTWARE_ONLY": 2 })
+
+		var numberdisplayAction = {
+
+			type: "com.elgato.numberdisplay.action",
+
+			onKeyDown: function (context, settings, coordinates, userDesiredState) {
+				var keyPressCounter = "";
+   			timer = setTimeout(function () {
+				isLongPush = true;
+        var UrlToShow = '';
+				if(settings != null && settings.hasOwnProperty('keyPressCounter')){
+					UrlToShow = settings["keyPressCounter"];
+					console.log("URL sauvegardée : " + UrlToShow);
+					numberdisplayAction.OpenURL(UrlToShow);
+				}
+					},1500);
+
+			},
+
+			onKeyUp: function (context, settings, coordinates, userDesiredState) {
+
+				clearTimeout(timer);
+
+				if (!isLongPush) {
+				var keyPressCounter = "";
+				var updatedSettings = {};
+				if (settings != null && settings.hasOwnProperty('keyPressCounter')) {
+					keyPressCounter = settings["keyPressCounter"];
+				}
+
+				var ws = new WebSocket('ws://127.0.0.1:8088/get');
+				
+				ws.onopen = function(event) {
+  			console.log("Socket connecté sur : " + ws.url)
+				
+				this.onmessage = function(event) {
+        console.log("Message reçu : ", event.data);
+				urlToSave = event.data;
+				updatedSettings["keyPressCounter"] = event.data;
+				numberdisplayAction.SetSettings(context, updatedSettings);
+    			};
+				};
+				
+			}
+			isLongPush = false;
+			},
+
+			onWillAppear: function (context, settings, coordinates) {
+				
+			},
+
+			OpenURL: function (url) {
+
+				var json = {
+    			"event": "openUrl",
+    			"payload": {
+        	"url": url
+    		}	
+			};
+			websocket.send(JSON.stringify(json));
+			},
+
+			SetTitle: function (context, keyPressCounter) {
+				var json = {
+					"event": "setTitle",
+					"context": context,
+					"payload": {
+						"title": "" + keyPressCounter,
+						"target": DestinationEnum.HARDWARE_AND_SOFTWARE
+					}
+				};
+
+				websocket.send(JSON.stringify(json));
+			},
+
+			SetSettings: function (context, settings) {
+				var json = {
+					"event": "setSettings",
+					"context": context,
+					"payload": settings
+				};
+
+				websocket.send(JSON.stringify(json));
+			},
+
+			AddToSettings: function (context, newSettings) {
+				settingsCache[context]
+			}
+		};
+
+		function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo) {
+			pluginUUID = inPluginUUID
+
+			// Open the web socket
+			websocket = new WebSocket("ws://127.0.0.1:" + inPort);
+
+			function registerPlugin(inPluginUUID) {
+				var json = {
+					"event": inRegisterEvent,
+					"uuid": inPluginUUID
+				};
+
+				websocket.send(JSON.stringify(json));
+			};
+
+			websocket.onopen = function () {
+				// WebSocket is connected, send message
+				registerPlugin(pluginUUID);
+			};
+
+			websocket.onmessage = function (evt) {
+				// Received message from Stream Deck
+				var jsonObj = JSON.parse(evt.data);
+				var event = jsonObj['event'];
+				var action = jsonObj['action'];
+				var context = jsonObj['context'];
+				var jsonPayload = jsonObj['payload'] || {};
+
+				if (event == "keyDown") {
+					var settings = jsonPayload['settings'];
+					var coordinates = jsonPayload['coordinates'];
+					var userDesiredState = jsonPayload['userDesiredState'];
+					numberdisplayAction.onKeyDown(context, settings, coordinates, userDesiredState);
+				}
+				else if (event == "keyUp") {
+					var settings = jsonPayload['settings'];
+					var coordinates = jsonPayload['coordinates'];
+					var userDesiredState = jsonPayload['userDesiredState'];
+					numberdisplayAction.onKeyUp(context, settings, coordinates, userDesiredState);
+				}
+				else if (event == "willAppear") {
+					var settings = jsonPayload['settings'];
+					var coordinates = jsonPayload['coordinates'];
+					numberdisplayAction.onWillAppear(context, settings, coordinates);
+				}
+				else if (event == "sendToPlugin") {
+
+					if (jsonPayload.hasOwnProperty('setValue')) {
+
+						var newValue = jsonPayload.setValue;
+						numberdisplayAction.SetSettings(context, { "keyPressCounter": newValue });
+						numberdisplayAction.SetTitle(context, newValue);
+
+					}
+
+					if (jsonPayload.hasOwnProperty('background-image')) {
+
+						const imageName = jsonPayload['background-image'];
+
+						loadImageAsDataUri(`${imageName}.png`, function (imgUrl) {
+							var json = {
+								"event": "setImage",
+								"context": context,
+								"payload": {
+									image: imgUrl || "",
+									target: DestinationEnum.HARDWARE_AND_SOFTWARE
+								}
+							};
+							websocket.send(JSON.stringify(json));
+						})
+
+					}
+				}
+			};
+
+			websocket.onclose = function () {
+				// Websocket is closed
+			};
+		};
+
+
+		function loadImageAsDataUri(url, callback) {
+			var image = new Image();
+
+			image.onload = function () {
+				var canvas = document.createElement("canvas");
+
+				canvas.width = this.naturalWidth;
+				canvas.height = this.naturalHeight;
+
+				var ctx = canvas.getContext("2d");
+				ctx.drawImage(this, 0, 0);
+				callback(canvas.toDataURL("image/png"));
+			};
+
+			image.src = url;
+		};
+
+	</script>
+
+</body>
+
+</html>

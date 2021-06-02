@@ -1,0 +1,16 @@
+{
+ "manifest_version": 3, 
+ "name": "Stream Deck Socket", 
+ "description": "Permet la communication entre Google Chrome et le Stream Deck", 
+ "version": "1.0",
+ "icons": {
+  "16": "img/icon_016.png",
+  "32": "img/icon_032.png",
+  "48": "img/icon_048.png",
+  "128" : "img/icon_128.png"
+ },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["tabs","activeTab"]
+}
