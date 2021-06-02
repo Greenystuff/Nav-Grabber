@@ -4,6 +4,7 @@
 Lancer automatiquement le Socket au démarrage de Windows :
 
 Dans un terminal :
+- npm install ws
 - npm install -g qckwinsvc
 - qckwinsvc
 - remplir le formulaire
