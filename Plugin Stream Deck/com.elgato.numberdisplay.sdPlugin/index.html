@@ -21,25 +21,9 @@
 			type: "com.elgato.numberdisplay.action",
 
 			onKeyDown: function (context, settings, coordinates, userDesiredState) {
-				var keyPressCounter = "";
    			timer = setTimeout(function () {
-				isLongPush = true;
-        var UrlToShow = '';
-				if(settings != null && settings.hasOwnProperty('keyPressCounter')){
-					UrlToShow = settings["keyPressCounter"];
-					console.log("URL sauvegardée : " + UrlToShow);
-					numberdisplayAction.OpenURL(UrlToShow);
-				}
-					},1500);
 
-			},
-
-			onKeyUp: function (context, settings, coordinates, userDesiredState) {
-
-				clearTimeout(timer);
-
-				if (!isLongPush) {
-				var keyPressCounter = "";
+					var keyPressCounter = "";
 				var updatedSettings = {};
 				if (settings != null && settings.hasOwnProperty('keyPressCounter')) {
 					keyPressCounter = settings["keyPressCounter"];
@@ -57,7 +41,22 @@
 				numberdisplayAction.SetSettings(context, updatedSettings);
     			};
 				};
-				
+					},1500);
+
+			},
+
+			onKeyUp: function (context, settings, coordinates, userDesiredState) {
+
+				clearTimeout(timer);
+
+				if (!isLongPush) {
+				isLongPush = true;
+        var UrlToShow = '';
+				if(settings != null && settings.hasOwnProperty('keyPressCounter')){
+					UrlToShow = settings["keyPressCounter"];
+					console.log("URL sauvegardée : " + UrlToShow);
+					numberdisplayAction.OpenURL(UrlToShow);
+				}				
 			}
 			isLongPush = false;
 			},
