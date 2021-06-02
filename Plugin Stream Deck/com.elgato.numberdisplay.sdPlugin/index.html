@@ -23,10 +23,10 @@
 			onKeyDown: function (context, settings, coordinates, userDesiredState) {
    			timer = setTimeout(function () {
 
-				var keyPressCounter = "";
+					var urlSaved = "";
 				var updatedSettings = {};
-				if (settings != null && settings.hasOwnProperty('keyPressCounter')) {
-					keyPressCounter = settings["keyPressCounter"];
+				if (settings != null && settings.hasOwnProperty('urlSaved')) {
+					urlSaved = settings["urlSaved"];
 				}
 
 				var ws = new WebSocket('ws://127.0.0.1:8088/get');
@@ -37,8 +37,9 @@
 				this.onmessage = function(event) {
         console.log("Message reçu : ", event.data);
 				urlToSave = event.data;
-				updatedSettings["keyPressCounter"] = event.data;
+				updatedSettings["urlSaved"] = event.data;
 				numberdisplayAction.SetSettings(context, updatedSettings);
+				isLongPush = true;
     			};
 				};
 					},1500);
@@ -52,8 +53,8 @@
 				if (!isLongPush) {
 				isLongPush = true;
         var UrlToShow = '';
-				if(settings != null && settings.hasOwnProperty('keyPressCounter')){
-					UrlToShow = settings["keyPressCounter"];
+				if(settings != null && settings.hasOwnProperty('urlSaved')){
+					UrlToShow = settings["urlSaved"];
 					console.log("URL sauvegardée : " + UrlToShow);
 					numberdisplayAction.OpenURL(UrlToShow);
 				}				
@@ -76,12 +77,12 @@
 			websocket.send(JSON.stringify(json));
 			},
 
-			SetTitle: function (context, keyPressCounter) {
+			SetTitle: function (context, urlSaved) {
 				var json = {
 					"event": "setTitle",
 					"context": context,
 					"payload": {
-						"title": "" + keyPressCounter,
+						"title": "" + urlSaved,
 						"target": DestinationEnum.HARDWARE_AND_SOFTWARE
 					}
 				};
@@ -154,7 +155,7 @@
 					if (jsonPayload.hasOwnProperty('setValue')) {
 
 						var newValue = jsonPayload.setValue;
-						numberdisplayAction.SetSettings(context, { "keyPressCounter": newValue });
+						numberdisplayAction.SetSettings(context, { "urlSaved": newValue });
 						numberdisplayAction.SetTitle(context, newValue);
 
 					}
