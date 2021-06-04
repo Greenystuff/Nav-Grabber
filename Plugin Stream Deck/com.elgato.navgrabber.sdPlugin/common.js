@@ -21,10 +21,10 @@ var $localizedStrings = $localizedStrings || {},
     // eslint-disable-next-line no-unused-vars
     isQT = navigator.appVersion.includes('QtWebEngine'),
     debug = debug || false,
-    debugLog = function () {},
+    debugLog = function () { },
     MIMAGECACHE = MIMAGECACHE || {};
 
-const setDebugOutput = (debug) => (debug === true) ? console.log.bind(window.console) : function () {};
+const setDebugOutput = (debug) => (debug === true) ? console.log.bind(window.console) : function () { };
 debugLog = setDebugOutput(debug);
 
 // Create a wrapper to allow passing JSON to the socket
@@ -42,7 +42,7 @@ String.prototype.lox = function () {
     var a = String(this);
     try {
         a = $localizedStrings[a] || a;
-    } catch (b) {}
+    } catch (b) { }
     return a;
 };
 
@@ -100,16 +100,16 @@ var Utils = {
     isNumber: function (value) {
         return typeof value === 'number' && value !== null;
     },
-    isInteger (value) {
+    isInteger(value) {
         return typeof value === 'number' && value === Number(value);
     },
-    isString (value) {
+    isString(value) {
         return typeof value === 'string';
     },
-    isImage (value) {
+    isImage(value) {
         return value instanceof HTMLImageElement;
     },
-    isCanvas (value) {
+    isCanvas(value) {
         return value instanceof HTMLCanvasElement;
     },
     isValue: function (value) {
@@ -145,7 +145,7 @@ Utils.percentToRange = function (percent, min, max) {
 };
 
 Utils.setDebugOutput = (debug) => {
-    return (debug === true) ? console.log.bind(window.console) : function () {};
+    return (debug === true) ? console.log.bind(window.console) : function () { };
 };
 
 Utils.randomComponentName = function (len = 6) {
@@ -211,7 +211,7 @@ Utils.isBlankString = (str) => {
     return (!str || /^\s*$/.test(str));
 };
 
-Utils.log = function () {};
+Utils.log = function () { };
 Utils.count = 0;
 Utils.counter = function () {
     return (this.count += 1);
@@ -293,15 +293,15 @@ Utils.hexToRgb = function (hex) {
 };
 
 Utils.rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
-    return x.toString(16).padStart(2,0)
+    return x.toString(16).padStart(2, 0)
 }).join('')
 
 
 Utils.nscolorToRgb = function (rP, gP, bP) {
     return {
-        r : Math.round(rP * 255),
-        g : Math.round(gP * 255),
-        b : Math.round(bP * 255)
+        r: Math.round(rP * 255),
+        g: Math.round(gP * 255),
+        b: Math.round(bP * 255)
     }
 };
 
@@ -318,7 +318,7 @@ Utils.kelvinToMired = function (kelvin, roundTo) {
     return roundTo ? Utils.roundBy(Math.round(1e6 / kelvin), roundTo) : Math.round(1e6 / kelvin);
 };
 
-Utils.roundBy = function(num, x) {
+Utils.roundBy = function (num, x) {
     return Math.round((num - 10) / x) * x;
 }
 
@@ -372,7 +372,7 @@ Utils.parseJson = function (jsonString) {
         if (o && typeof o === 'object') {
             return o;
         }
-    } catch (e) {}
+    } catch (e) { }
 
     return false;
 };
@@ -484,12 +484,12 @@ Utils.getDataUri = function (url, callback, inCanvas, inFillcolor) {
 * e.g. injectStyle('.localbody { background-color: green;}')
 */
 Utils.injectStyle = function (styles, styleId) {
-   const node = document.createElement('style');
-   const tempID = styleId || Utils.randomString(8);
-   node.setAttribute('id', tempID);
-   node.innerHTML = styles;
-   document.body.appendChild(node);
-   return node;
+    const node = document.createElement('style');
+    const tempID = styleId || Utils.randomString(8);
+    node.setAttribute('id', tempID);
+    node.innerHTML = styles;
+    document.body.appendChild(node);
+    return node;
 };
 
 
@@ -595,7 +595,7 @@ Utils.onChange = function (object, callback) {
     /** https://github.com/sindresorhus/on-change */
     'use strict';
     const handler = {
-        get (target, property, receiver) {
+        get(target, property, receiver) {
             try {
                 console.log('get via Proxy: ', property, target, receiver);
                 return new Proxy(target[property], handler);
@@ -604,19 +604,19 @@ Utils.onChange = function (object, callback) {
                 return Reflect.get(target, property, receiver);
             }
         },
-        set (target, property, value, receiver) {
+        set(target, property, value, receiver) {
             console.log('Utils.onChange:set1:', target, property, value, receiver);
             // target[property] = value;
             const b = Reflect.set(target, property, value);
             console.log('Utils.onChange:set2:', target, property, value, receiver);
             return b;
         },
-        defineProperty (target, property, descriptor) {
+        defineProperty(target, property, descriptor) {
             console.log('Utils.onChange:defineProperty:', target, property, descriptor);
             callback(target, property, descriptor);
             return Reflect.defineProperty(target, property, descriptor);
         },
-        deleteProperty (target, property) {
+        deleteProperty(target, property) {
             console.log('Utils.onChange:deleteProperty:', target, property);
             callback(target, property);
             return Reflect.deleteProperty(target, property);
@@ -630,23 +630,23 @@ Utils.observeArray = function (object, callback) {
     'use strict';
     const array = [];
     const handler = {
-        get (target, property, receiver) {
+        get(target, property, receiver) {
             try {
                 return new Proxy(target[property], handler);
             } catch (err) {
                 return Reflect.get(target, property, receiver);
             }
         },
-        set (target, property, value, receiver) {
+        set(target, property, value, receiver) {
             console.log('XXXUtils.observeArray:set1:', target, property, value, array);
             target[property] = value;
             console.log('XXXUtils.observeArray:set2:', target, property, value, array);
         },
-        defineProperty (target, property, descriptor) {
+        defineProperty(target, property, descriptor) {
             callback(target, property, descriptor);
             return Reflect.defineProperty(target, property, descriptor);
         },
-        deleteProperty (target, property) {
+        deleteProperty(target, property) {
             callback(target, property, descriptor);
             return Reflect.deleteProperty(target, property);
         }
@@ -670,7 +670,7 @@ window['_'] = Utils;
 
 
 // eslint-disable-next-line no-unused-vars
-function connectElgatoStreamDeckSocket (
+function connectElgatoStreamDeckSocket(
     inPort,
     inUUID,
     inMessageType,
@@ -683,7 +683,7 @@ function connectElgatoStreamDeckSocket (
 
 /* legacy support */
 
-function connectSocket (
+function connectSocket(
     inPort,
     inUUID,
     inMessageType,
@@ -711,7 +711,7 @@ const StreamDeck = (function () {
       Populate and initialize internally used properties
     */
 
-    function init () {
+    function init() {
         // *** PRIVATE ***
 
         var inPort,
@@ -724,7 +724,7 @@ const StreamDeck = (function () {
         var events = ELGEvents.eventEmitter();
         var logger = SDDebug.logger();
 
-        function showVars () {
+        function showVars() {
             debugLog('---- showVars');
             debugLog('- port', inPort);
             debugLog('- uuid', inUUID);
@@ -734,7 +734,7 @@ const StreamDeck = (function () {
             debugLog('----< showVars');
         }
 
-        function connect (args) {
+        function connect(args) {
             inPort = args[0];
             inUUID = args[1];
             inMessageType = args[2];
@@ -746,10 +746,10 @@ const StreamDeck = (function () {
                 showVars();
             }
 
-            const lang = Utils.getProp(inApplicationInfo,'application.language', false);
+            const lang = Utils.getProp(inApplicationInfo, 'application.language', false);
             if (lang) {
-                loadLocalization(lang, inMessageType === 'registerPropertyInspector' ? '../' : './', function() {
-                    events.emit('localizationLoaded', {language:lang});
+                loadLocalization(lang, inMessageType === 'registerPropertyInspector' ? '../' : './', function () {
+                    events.emit('localizationLoaded', { language: lang });
                 });
             };
 
@@ -815,15 +815,15 @@ const StreamDeck = (function () {
                     // console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[common.js]onmessage:', m);
                 } else {
                     switch (inMessageType) {
-                    case 'registerPlugin':
-                        m = jsonObj['action'] + '.' + jsonObj['event'];
-                        break;
-                    case 'registerPropertyInspector':
-                        m = 'sendToPropertyInspector';
-                        break;
-                    default:
-                        console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++');
-                        console.warn('UNREGISTERED MESSAGETYPE:', inMessageType);
+                        case 'registerPlugin':
+                            m = jsonObj['action'] + '.' + jsonObj['event'];
+                            break;
+                        case 'registerPropertyInspector':
+                            m = 'sendToPropertyInspector';
+                            break;
+                        default:
+                            console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++');
+                            console.warn('UNREGISTERED MESSAGETYPE:', inMessageType);
                     }
                 }
 
@@ -858,7 +858,7 @@ const StreamDeck = (function () {
 })();
 
 // eslint-disable-next-line no-unused-vars
-function initializeControlCenterClient () {
+function initializeControlCenterClient() {
     const settings = Object.assign(REMOTESETTINGS || {}, { debug: false });
     var $CC = new ControlCenterClient(settings);
     window['$CC'] = $CC;
@@ -889,7 +889,7 @@ const ELGEvents = {
         return Object.freeze({ on, has, emit, eventList });
     },
 
-    pubSub: function pubSub () {
+    pubSub: function pubSub() {
         const subscribers = new Set();
 
         const sub = fn => {
@@ -1059,7 +1059,7 @@ const SDApi = {
         getGlobalSettings: function (context, payload) {
             SDApi.send(context, 'getGlobalSettings', {});
         },
-        
+
         setGlobalSettings: function (context, payload) {
             SDApi.send(context, 'setGlobalSettings', {
                 payload: payload
@@ -1145,7 +1145,7 @@ const SDDebug = {
 window.$SD = StreamDeck.getInstance();
 window.$SD.api = SDApi;
 
-function WEBSOCKETERROR (evt) {
+function WEBSOCKETERROR(evt) {
     // Websocket is closed
     var reason = '';
     if (evt.code === 1000) {
