@@ -66,7 +66,7 @@
     			"event": "setImage",
     			"context": context,
     			"payload": {
-        	"image": "data:image/png;base64," + image,
+        	"image": image,
         	"target": 0,
     			}
 				};
@@ -75,29 +75,26 @@
 
 			getBase64Image: function(imgUrl, callback) {
 
-    var img = new Image();
+    	var img = new Image();
 
-    // onload fires when the image is fully loadded, and has width and height
+    	// onload fires when the image is fully loadded, and has width and height
 
-    img.onload = function(){
+    	img.onload = function(){
 
       var canvas = document.createElement("canvas");
       canvas.width = img.width;
       canvas.height = img.height;
       var ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0);
-      var dataURL = canvas.toDataURL("image/png"),
-          dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+      var dataURL = canvas.toDataURL("image/png");
 
       callback(dataURL); // the base64 string
-
     };
 
     // set attributes and src 
     img.setAttribute('crossOrigin', 'anonymous'); //
     img.src = imgUrl;
-
-},
+		},
 
 			ShowOk: function (context) {
 				var json = {
