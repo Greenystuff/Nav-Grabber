@@ -21,9 +21,8 @@
 		type: "com.elgato.URLsaver.action",
 
 		onKeyDown: function (context, settings, coordinates, userDesiredState) {
-   		timer = setTimeout(function () {
-				var ws = new WebSocket('ws://127.0.0.1:8088/get');
-				
+			timer = setTimeout(function () {
+				var ws = new WebSocket('ws://127.0.0.1:8088/get');				
 				ws.onopen = function(event) {
   				console.log("Socket connecté sur : " + ws.url)
 				
@@ -32,6 +31,7 @@
 						updatedSettings = {};
 						updatedSettings["navPayload"] = event.data;
 						URLsaverAction.SetSettings(context, updatedSettings);
+						URLsaverAction.ShowOk(context);
 						isLongPush = true;
     			};
 				};
@@ -41,7 +41,6 @@
 			onKeyUp: function (context, settings, coordinates, userDesiredState) {
 
 				clearTimeout(timer);
-
 				if (!isLongPush) {
         	var UrlToShow = '';
 					if(settings != null && settings.hasOwnProperty('navPayload')){
@@ -57,6 +56,14 @@
 			onWillAppear: function (context, settings, coordinates) {
 				
 			},
+
+			ShowOk: function (context) {
+				var json = {
+    			"event": "showOk",
+    			"context": context,
+				};
+			websocket.send(JSON.stringify(json));
+			},			
 
 			OpenURL: function (url) {
 				var json = {
