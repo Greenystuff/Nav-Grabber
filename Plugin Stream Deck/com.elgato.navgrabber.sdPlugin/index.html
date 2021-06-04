@@ -18,48 +18,40 @@
 
 		var URLsaverAction = {
 
-			type: "com.elgato.URLsaver.action",
+		type: "com.elgato.URLsaver.action",
 
 		onKeyDown: function (context, settings, coordinates, userDesiredState) {
-   			timer = setTimeout(function () {
-
-				var urlSaved = "";
-				var updatedSettings = {};
-				if (settings != null && settings.hasOwnProperty('urlSaved')) {
-					urlSaved = settings["urlSaved"];
-				}
-
+   		timer = setTimeout(function () {
 				var ws = new WebSocket('ws://127.0.0.1:8088/get');
 				
 				ws.onopen = function(event) {
-  			console.log("Socket connecté sur : " + ws.url)
+  				console.log("Socket connecté sur : " + ws.url)
 				
-				this.onmessage = function(event) {
-        console.log("Message reçu : ", event.data);
-				urlToSave = event.data;
-				updatedSettings["urlSaved"] = event.data;
-				URLsaverAction.SetSettings(context, updatedSettings);
-				isLongPush = true;
+					this.onmessage = function(event) {
+        		console.log("Message reçu : ", event.data);
+						updatedSettings = {};
+						updatedSettings["navPayload"] = event.data;
+						URLsaverAction.SetSettings(context, updatedSettings);
+						isLongPush = true;
     			};
 				};
-					},1500);
-
-			},
+			},1500);
+		},
 
 			onKeyUp: function (context, settings, coordinates, userDesiredState) {
 
 				clearTimeout(timer);
 
 				if (!isLongPush) {
-				isLongPush = true;
-        var UrlToShow = '';
-				if(settings != null && settings.hasOwnProperty('urlSaved')){
-					UrlToShow = settings["urlSaved"];
-					console.log("URL sauvegardée : " + UrlToShow);
-					URLsaverAction.OpenURL(UrlToShow);
-				}				
-			}
-			isLongPush = false;
+        	var UrlToShow = '';
+					if(settings != null && settings.hasOwnProperty('navPayload')){
+						var jsonObj = JSON.parse(settings["navPayload"]);
+						UrlToShow = jsonObj['url'];
+						console.log("URL sauvegardée : " + UrlToShow);
+						URLsaverAction.OpenURL(UrlToShow);
+					}
+				}
+				isLongPush = false;
 			},
 
 			onWillAppear: function (context, settings, coordinates) {
@@ -67,7 +59,6 @@
 			},
 
 			OpenURL: function (url) {
-
 				var json = {
     			"event": "openUrl",
     			"payload": {
@@ -77,12 +68,13 @@
 			websocket.send(JSON.stringify(json));
 			},
 
-			SetTitle: function (context, urlSaved) {
+			SetTitle: function (context, navPayload) {
+				var jsonObj = JSON.parse(event.data);
 				var json = {
 					"event": "setTitle",
 					"context": context,
 					"payload": {
-						"title": "" + urlSaved,
+						"title": "" + jsonObj['url'],
 						"target": DestinationEnum.HARDWARE_AND_SOFTWARE
 					}
 				};
@@ -155,7 +147,7 @@
 					if (jsonPayload.hasOwnProperty('setValue')) {
 
 						var newValue = jsonPayload.setValue;
-						URLsaverAction.SetSettings(context, { "urlSaved": newValue });
+						URLsaverAction.SetSettings(context, { "navPayload": newValue });
 						URLsaverAction.SetTitle(context, newValue);
 
 					}
