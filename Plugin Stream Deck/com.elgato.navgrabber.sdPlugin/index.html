@@ -66,7 +66,7 @@
     			"event": "setImage",
     			"context": context,
     			"payload": {
-        	"image": image,
+        	"image": "data:image/png;base64," + image,
         	"target": 0,
     			}
 				};
@@ -86,7 +86,8 @@
       canvas.height = img.height;
       var ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0);
-      var dataURL = canvas.toDataURL("image/png");
+      var dataURL = canvas.toDataURL("image/png"),
+      dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 
       callback(dataURL); // the base64 string
     };
