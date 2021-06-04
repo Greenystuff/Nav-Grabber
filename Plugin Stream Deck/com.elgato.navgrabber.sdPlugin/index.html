@@ -17,37 +17,37 @@
 
 		var URLsaverAction = {
 
-		type: "com.elgato.URLsaver.action",
+			type: "com.elgato.URLsaver.action",
 
-		onKeyDown: function (context, settings, coordinates, userDesiredState) {
-			timer = setTimeout(function () {
-				var ws = new WebSocket('ws://127.0.0.1:8088/get');				
-				ws.onopen = function(event) {
-  				console.log("Socket connecté sur : " + ws.url)
-				
-					this.onmessage = function(event) {
-        		console.log("Message reçu : ", event.data);
-						updatedSettings = {};
-						updatedSettings["navPayload"] = event.data;
-						URLsaverAction.SetSettings(context, updatedSettings);
-						URLsaverAction.ShowOk(context);
-						isLongPush = true;
-						let JsonObj = JSON.parse(event.data);
-						let faviconUrl = JsonObj['Favicon'];
-						URLsaverAction.getBase64Image(faviconUrl, function(base64image){
-						URLsaverAction.setImage(base64image, context);
-						});
-    			};
-				};
-			},1000);
-		},
+			onKeyDown: function (context, settings, coordinates, userDesiredState) {
+				timer = setTimeout(function () {
+					var ws = new WebSocket('ws://127.0.0.1:8088/get');
+					ws.onopen = function (event) {
+						console.log("Socket connecté sur : " + ws.url)
+
+						this.onmessage = function (event) {
+							console.log("Message reçu : ", event.data);
+							updatedSettings = {};
+							updatedSettings["navPayload"] = event.data;
+							URLsaverAction.SetSettings(context, updatedSettings);
+							URLsaverAction.ShowOk(context);
+							isLongPush = true;
+							let JsonObj = JSON.parse(event.data);
+							let faviconUrl = JsonObj['Favicon'];
+							URLsaverAction.getBase64Image(faviconUrl, function (base64image) {
+								URLsaverAction.setImage(base64image, context);
+							});
+						};
+					};
+				}, 1000);
+			},
 
 			onKeyUp: function (context, settings, coordinates, userDesiredState) {
 
 				clearTimeout(timer);
 				if (!isLongPush) {
-        	var UrlToShow = '';
-					if(settings != null && settings.hasOwnProperty('navPayload')){
+					var UrlToShow = '';
+					if (settings != null && settings.hasOwnProperty('navPayload')) {
 						var jsonObj = JSON.parse(settings["navPayload"]);
 						UrlToShow = jsonObj['url'];
 						console.log("URL sauvegardée : " + UrlToShow);
@@ -58,61 +58,61 @@
 			},
 
 			onWillAppear: function (context, settings, coordinates) {
-				
+
 			},
 
 			setImage: function (image, context) {
 				var json = {
-    			"event": "setImage",
-    			"context": context,
-    			"payload": {
-        	"image": "data:image/png;base64," + image,
-        	"target": 0,
-    			}
+					"event": "setImage",
+					"context": context,
+					"payload": {
+						"image": "data:image/png;base64," + image,
+						"target": 0,
+					}
 				};
-			websocket.send(JSON.stringify(json));
+				websocket.send(JSON.stringify(json));
 			},
 
-			getBase64Image: function(imgUrl, callback) {
+			getBase64Image: function (imgUrl, callback) {
 
-    	var img = new Image();
+				var img = new Image();
 
-    	// onload fires when the image is fully loadded, and has width and height
+				// onload fires when the image is fully loadded, and has width and height
 
-    	img.onload = function(){
+				img.onload = function () {
 
-      var canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      var ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      var dataURL = canvas.toDataURL("image/png"),
-      dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+					var canvas = document.createElement("canvas");
+					canvas.width = img.width;
+					canvas.height = img.height;
+					var ctx = canvas.getContext("2d");
+					ctx.drawImage(img, 0, 0);
+					var dataURL = canvas.toDataURL("image/png"),
+						dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 
-      callback(dataURL); // the base64 string
-    };
+					callback(dataURL); // the base64 string
+				};
 
-    // set attributes and src 
-    img.setAttribute('crossOrigin', 'anonymous'); //
-    img.src = imgUrl;
-		},
+				// set attributes and src 
+				img.setAttribute('crossOrigin', 'anonymous'); //
+				img.src = imgUrl;
+			},
 
 			ShowOk: function (context) {
 				var json = {
-    			"event": "showOk",
-    			"context": context,
+					"event": "showOk",
+					"context": context,
 				};
-			websocket.send(JSON.stringify(json));
-			},			
+				websocket.send(JSON.stringify(json));
+			},
 
 			OpenURL: function (url) {
 				var json = {
-    			"event": "openUrl",
-    			"payload": {
-        	"url": url
-    		}	
-			};
-			websocket.send(JSON.stringify(json));
+					"event": "openUrl",
+					"payload": {
+						"url": url
+					}
+				};
+				websocket.send(JSON.stringify(json));
 			},
 
 			SetTitle: function (context, navPayload) {
