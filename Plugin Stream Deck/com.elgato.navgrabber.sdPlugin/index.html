@@ -12,7 +12,6 @@
 		var websocket = null;
 		var pluginUUID = null;
 		var settingsCache = {};
-		let urlToSave = '';
 		let isLongPush = false;
 		var DestinationEnum = Object.freeze({ "HARDWARE_AND_SOFTWARE": 0, "HARDWARE_ONLY": 1, "SOFTWARE_ONLY": 2 })
 
@@ -33,9 +32,14 @@
 						URLsaverAction.SetSettings(context, updatedSettings);
 						URLsaverAction.ShowOk(context);
 						isLongPush = true;
+						let JsonObj = JSON.parse(event.data);
+						let faviconUrl = JsonObj['Favicon'];
+						URLsaverAction.getBase64Image(faviconUrl, function(base64image){
+						URLsaverAction.setImage(base64image, context);
+						});
     			};
 				};
-			},1500);
+			},1000);
 		},
 
 			onKeyUp: function (context, settings, coordinates, userDesiredState) {
@@ -56,6 +60,44 @@
 			onWillAppear: function (context, settings, coordinates) {
 				
 			},
+
+			setImage: function (image, context) {
+				var json = {
+    			"event": "setImage",
+    			"context": context,
+    			"payload": {
+        	"image": "data:image/png;base64," + image,
+        	"target": 0,
+    			}
+				};
+			websocket.send(JSON.stringify(json));
+			},
+
+			getBase64Image: function(imgUrl, callback) {
+
+    var img = new Image();
+
+    // onload fires when the image is fully loadded, and has width and height
+
+    img.onload = function(){
+
+      var canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      var dataURL = canvas.toDataURL("image/png"),
+          dataURL = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+
+      callback(dataURL); // the base64 string
+
+    };
+
+    // set attributes and src 
+    img.setAttribute('crossOrigin', 'anonymous'); //
+    img.src = imgUrl;
+
+},
 
 			ShowOk: function (context) {
 				var json = {
