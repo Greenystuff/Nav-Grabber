@@ -58,6 +58,17 @@
 			},
 
 			onWillAppear: function (context, settings, coordinates) {
+				var FaviconToShow = '';
+
+				if (settings != null && settings.hasOwnProperty('navPayload')) {
+					var jsonObj = JSON.parse(settings["navPayload"]);
+					FaviconToShow = jsonObj['Favicon'];
+					console.log("Favicon : " + FaviconToShow);
+					URLsaverAction.getBase64Image(FaviconToShow, function (base64image) {
+						URLsaverAction.setImage(base64image, context);
+					});
+				}
+
 
 			},
 
